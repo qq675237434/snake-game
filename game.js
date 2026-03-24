@@ -167,6 +167,14 @@ class SnakeGame {
         
         // 更新初始覆盖层消息
         this.overlayMessage.textContent = '请先选择难度，然后选择皮肤开始游戏';
+        
+        // 确保底部按钮栏可见（初始状态）
+        const buttonsContainer = this.startBtn.closest('.overlay-buttons');
+        if (buttonsContainer) {
+            buttonsContainer.style.display = 'flex';
+        }
+        this.startBtn.textContent = '开始游戏';
+        this.pauseBtn.style.display = 'none';
     }
 
     /**
@@ -620,9 +628,18 @@ class SnakeGame {
             this.difficultyDisplay.style.display = 'flex';
         }
 
-        // 隐藏覆盖层
+        // 隐藏覆盖层和底部按钮栏
         this.overlay.classList.add('hidden');
+        
+        // 隐藏底部按钮栏（游戏进行中不需要）
+        const buttonsContainer = this.startBtn.closest('.overlay-buttons');
+        if (buttonsContainer) {
+            buttonsContainer.style.display = 'none';
+        }
+        
+        // 显示暂停按钮（独立显示，用于游戏进行中暂停）
         this.pauseBtn.style.display = 'inline-block';
+        this.pauseBtn.textContent = '暂停游戏';
 
         // 启动游戏循环
         this.gameLoop = setInterval(() => this.update(), this.speed);
@@ -716,6 +733,8 @@ class SnakeGame {
             `最终得分：${this.score}\n难度：${difficultyName}\n${this.score >= difficultyHighScore ? '🎉 新纪录！' : '再接再厉！'}`,
             true
         );
+        
+        // 隐藏暂停按钮（游戏已结束）
         this.pauseBtn.style.display = 'none';
         
         // 重新显示皮肤选择器（让玩家可以选择新解锁的皮肤）
@@ -758,11 +777,14 @@ class SnakeGame {
         this.overlayMessage.textContent = message;
         this.overlay.classList.remove('hidden');
         
+        // 控制底部按钮栏显示
+        const buttonsContainer = this.startBtn.closest('.overlay-buttons');
+        if (buttonsContainer) {
+            buttonsContainer.style.display = showButton ? 'flex' : 'none';
+        }
+        
         if (showButton) {
             this.startBtn.textContent = '重新开始';
-            this.startBtn.style.display = 'inline-block';
-        } else {
-            this.startBtn.style.display = 'none';
         }
     }
 
