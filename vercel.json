@@ -1,0 +1,13 @@
+{
+  "name": "snake-game",
+  "buildCommand": null,
+  "installCommand": null,
+  "outputDirectory": ".",
+  "devCommand": null,
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}
