@@ -1,0 +1,457 @@
+/**
+ * 贪吃蛇游戏样式表
+ * 响应式设计，支持桌面端和移动端
+ */
+
+/* ========================================
+   CSS 变量定义
+   ======================================== */
+:root {
+    --primary-color: #4CAF50;
+    --primary-dark: #388E3C;
+    --secondary-color: #FF9800;
+    --danger-color: #f44336;
+    --bg-color: #1a1a2e;
+    --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    --canvas-bg: #0f0f23;
+    --text-color: #ffffff;
+    --text-muted: #a0a0a0;
+    --border-color: #2a2a4e;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --snake-color: #4CAF50;
+    --snake-head-color: #66BB6A;
+    --food-color: #FF5252;
+    --grid-line-color: rgba(255, 255, 255, 0.05);
+}
+
+/* ========================================
+   基础样式重置
+   ======================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+/* ========================================
+   游戏主容器
+   ======================================== */
+.game-container {
+    max-width: 640px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 60px var(--shadow-color);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+}
+
+/* ========================================
+   游戏标题
+   ======================================== */
+.game-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.game-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.game-header .subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 300;
+}
+
+/* ========================================
+   信息面板（分数显示）
+   ======================================== */
+.info-panel {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.score-board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+}
+
+.score-board .label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+.score-board .score {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.score-board .high-score {
+    color: var(--secondary-color);
+}
+
+/* ========================================
+   画布容器
+   ======================================== */
+.canvas-wrapper {
+    position: relative;
+    margin: 0 auto 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    border: 3px solid var(--border-color);
+}
+
+#gameCanvas {
+    display: block;
+    background: var(--canvas-bg);
+    width: 100%;
+    height: auto;
+    max-width: 600px;
+}
+
+/* ========================================
+   游戏覆盖层（开始/暂停/结束界面）
+   ======================================== */
+.game-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    transition: opacity 0.3s ease;
+}
+
+.game-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.overlay-content {
+    text-align: center;
+    padding: 30px;
+}
+
+.overlay-content h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+}
+
+.overlay-content p {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 25px;
+    line-height: 1.8;
+}
+
+/* ========================================
+   按钮样式
+   ======================================== */
+.btn {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+.btn-secondary {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #F57C00;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* ========================================
+   移动端控制按钮
+   ======================================== */
+.mobile-controls {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.control-row {
+    display: flex;
+    gap: 10px;
+}
+
+.control-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--primary-color);
+}
+
+.control-btn:active {
+    background: var(--primary-color);
+    transform: scale(0.95);
+}
+
+/* ========================================
+   游戏说明
+   ======================================== */
+.game-instructions {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.game-instructions h3 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+}
+
+.game-instructions ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.game-instructions li {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.game-instructions li strong {
+    color: var(--text-color);
+}
+
+/* ========================================
+   键盘按键样式
+   ======================================== */
+kbd {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+/* ========================================
+   页脚
+   ======================================== */
+.game-footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* ========================================
+   响应式设计 - 平板设备
+   ======================================== */
+@media screen and (max-width: 768px) {
+    .game-container {
+        padding: 20px;
+    }
+
+    .game-header h1 {
+        font-size: 2rem;
+    }
+
+    #gameCanvas {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .info-panel {
+        padding: 10px;
+    }
+
+    .score-board .score {
+        font-size: 1.5rem;
+    }
+}
+
+/* ========================================
+   响应式设计 - 移动设备
+   ======================================== */
+@media screen and (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .game-container {
+        padding: 15px;
+        border-radius: 15px;
+    }
+
+    .game-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .game-header .subtitle {
+        font-size: 0.9rem;
+    }
+
+    .info-panel {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .score-board {
+        min-width: 80px;
+    }
+
+    .score-board .score {
+        font-size: 1.3rem;
+    }
+
+    /* 显示移动端控制按钮 */
+    .mobile-controls {
+        display: flex;
+    }
+
+    .control-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+
+    .overlay-content {
+        padding: 20px;
+    }
+
+    .overlay-content h2 {
+        font-size: 1.5rem;
+    }
+
+    .overlay-content p {
+        font-size: 0.9rem;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+
+    .game-instructions {
+        padding: 15px;
+    }
+
+    .game-instructions h3 {
+        font-size: 1rem;
+    }
+
+    .game-instructions li {
+        font-size: 0.85rem;
+    }
+}
+
+/* ========================================
+   动画效果
+   ======================================== */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.btn-primary:hover {
+    animation: pulse 0.6s ease-in-out;
+}
+
+/* ========================================
+   无障碍辅助
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* 焦点样式（键盘导航） */
+.btn:focus,
+.control-btn:focus {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+    :root {
+        --border-color: #ffffff;
+        --text-muted: #ffffff;
+    }
+}
