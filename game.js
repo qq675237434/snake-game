@@ -870,8 +870,166 @@ class SnakeGame {
 }
 
 // ========================================
-// 启动游戏
+// 启动游戏 + 排行榜 + 评论系统
 // ========================================
 document.addEventListener('DOMContentLoaded', () => {
     window.game = new SnakeGame();
+
+    // ========================================
+    // 排行榜系统
+    // ========================================
+    const leaderboard = new LeaderboardManager();
+    const commentSystem = new CommentSystem();
+
+    // 昵称管理
+    const nicknameModal = document.getElementById('nicknameModal');
+    const nicknameInput = document.getElementById('nicknameInput');
+    const nicknameSave = document.getElementById('nicknameSave');
+    const setNicknameBtn = document.getElementById('setNicknameBtn');
+    const displayNickname = document.getElementById('displayNickname');
+
+    // 初始化昵称
+    const savedNick = leaderboard.getNickname();
+    displayNickname.textContent = savedNick;
+
+    setNicknameBtn.addEventListener('click', () => {
+        nicknameInput.value = leaderboard.getNickname();
+        nicknameModal.classList.remove('hidden');
+        nicknameInput.focus();
+    });
+
+    nicknameSave.addEventListener('click', () => {
+        const name = nicknameInput.value.trim() || '蛇友';
+        leaderboard.setNickname(name);
+        commentSystem.setNickname(name);
+        displayNickname.textContent = name;
+        nicknameModal.classList.add('hidden');
+    });
+
+    nicknameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') nicknameSave.click();
+    });
+
+    nicknameModal.addEventListener('click', (e) => {
+        if (e.target === nicknameModal) nicknameModal.classList.add('hidden');
+    });
+
+    // ========================================
+    // 渲染排行榜
+    // ========================================
+    function renderLeaderboard(highlightId) {
+        const list = document.getElementById('leaderboardList');
+        const countBadge = document.getElementById('leaderboardCount');
+        const top20 = leaderboard.getTop20();
+
+        countBadge.textContent = 'TOP ' + Math.min(top20.length, 20);
+
+        if (top20.length === 0) {
+            list.innerHTML = '<div class="empty-state">暂无记录，快来挑战！</div>';
+            return;
+        }
+
+        list.innerHTML = top20.map((record, i) => {
+            const rank = i + 1;
+            const topClass = rank <= 3 ? ` top-${rank}` : '';
+            const hlClass = record.id === highlightId ? ' highlight' : '';
+            return `
+                <div class="leaderboard-item${topClass}${hlClass}">
+                    <span class="leaderboard-rank">${leaderboard.getRankMedal(rank)}</span>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-name">${escapeHtml(record.nickname)}</div>
+                        <div class="leaderboard-meta">${leaderboard.getDifficultyLabel(record.difficulty)} · ${leaderboard.formatTime(record.time)}</div>
+                    </div>
+                    <span class="leaderboard-score">${record.score}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ========================================
+    // 渲染评论
+    // ========================================
+    function renderComments(newId) {
+        const list = document.getElementById('commentList');
+        const countBadge = document.getElementById('commentCount');
+        const comments = commentSystem.getRecent(30);
+
+        countBadge.textContent = comments.length;
+
+        if (comments.length === 0) {
+            list.innerHTML = '<div class="empty-state">暂无评论，快来发第一条！</div>';
+            return;
+        }
+
+        list.innerHTML = comments.map(c => {
+            const isLiked = commentSystem.isLiked(c.id);
+            const newClass = c.id === newId ? ' new-comment' : '';
+            return `
+                <div class="comment-item${newClass}" data-id="${c.id}">
+                    <div class="comment-header">
+                        <span class="comment-author">${escapeHtml(c.nickname)}</span>
+                        <span class="comment-score-badge">${commentSystem.getDiffLabel(c.difficulty)} ${c.score}分</span>
+                    </div>
+                    <div class="comment-body">${escapeHtml(c.content)}</div>
+                    <div class="comment-footer">
+                        <span class="comment-time">${commentSystem.formatTime(c.time)}</span>
+                        <button class="comment-like-btn${isLiked ? ' liked' : ''}" data-id="${c.id}">
+                            ${isLiked ? '❤️' : '🤍'} ${c.likes}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // 评论发送
+    const commentInput = document.getElementById('commentInput');
+    const commentSendBtn = document.getElementById('commentSendBtn');
+
+    function sendComment() {
+        const text = commentInput.value.trim();
+        if (!text) return;
+        const score = window.game ? window.game.score : 0;
+        const diff = window.game ? window.game.currentDifficulty : 'easy';
+        const c = commentSystem.addComment(text, score, diff);
+        commentInput.value = '';
+        if (c) renderComments(c.id);
+    }
+
+    commentSendBtn.addEventListener('click', sendComment);
+    commentInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendComment();
+    });
+
+    // 点赞代理
+    document.getElementById('commentList').addEventListener('click', (e) => {
+        const btn = e.target.closest('.comment-like-btn');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        commentSystem.toggleLike(id);
+        renderComments();
+    });
+
+    // ========================================
+    // Hook：游戏结束时更新排行榜和评论
+    // ========================================
+    const originalGameOver = window.game.gameOver.bind(window.game);
+    window.game.gameOver = function() {
+        originalGameOver();
+        const { rank, isTop20 } = leaderboard.addRecord(this.score, this.currentDifficulty);
+        const record = leaderboard.records.find(r => r.score === this.score);
+        renderLeaderboard(record ? record.id : null);
+        renderComments();
+    };
+
+    // 初始渲染
+    renderLeaderboard();
+    renderComments();
+
+    // 工具函数
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 });
