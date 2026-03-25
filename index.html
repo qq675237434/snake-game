@@ -8,111 +8,132 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
-        <!-- 游戏标题 -->
-        <header class="game-header">
-            <h1>🐍 贪吃蛇</h1>
-            <p class="subtitle">Classic Snake Game</p>
-        </header>
-
-        <!-- 游戏信息面板 -->
-        <div class="info-panel">
-            <div class="score-board">
-                <span class="label">得分</span>
-                <span id="currentScore" class="score">0</span>
-            </div>
-            <div class="score-board">
-                <span class="label">最高分</span>
-                <span id="highScore" class="score high-score">0</span>
-            </div>
+    <!-- 昵称设置弹窗 -->
+    <div id="nicknameModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>🎮 设置你的昵称</h3>
+            <input type="text" id="nicknameInput" maxlength="10" placeholder="输入昵称（最多10字）" />
+            <button id="nicknameSave" class="btn btn-primary">确定</button>
         </div>
-
-        <!-- 游戏画布容器 -->
-        <div class="canvas-wrapper">
-            <canvas id="gameCanvas" width="600" height="400"></canvas>
-            
-            <!-- 游戏覆盖层（仅显示状态信息和开始按钮） -->
-            <div id="gameOverlay" class="game-overlay">
-                <div class="overlay-content">
-                    <h2 id="overlayTitle">贪吃蛇游戏</h2>
-                    <p id="overlayMessage">使用方向键或 WASD 控制蛇的移动</p>
-                    <!-- 游戏进行中难度显示 -->
-                    <div id="difficultyDisplay" class="difficulty-display" style="display: none;">
-                        <span class="difficulty-label">难度：</span>
-                        <span id="currentDifficulty" class="difficulty-value">容易</span>
-                    </div>
-                </div>
-                <div class="overlay-buttons">
-                    <button id="startBtn" class="btn btn-primary">开始游戏</button>
-                    <button id="pauseBtn" class="btn btn-secondary" style="display: none;">暂停游戏</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 难度选择（游戏框下方） -->
-        <div id="difficultyPanel" class="settings-panel">
-            <h3 class="panel-title">🎯 难度选择</h3>
-            <div class="difficulty-options">
-                <button class="difficulty-btn easy selected" data-difficulty="easy">
-                    <span class="difficulty-icon">🟢</span>
-                    <span class="difficulty-name">容易</span>
-                    <span class="difficulty-desc">适合新手，速度慢</span>
-                </button>
-                <button class="difficulty-btn hard" data-difficulty="hard">
-                    <span class="difficulty-icon">🟡</span>
-                    <span class="difficulty-name">困难</span>
-                    <span class="difficulty-desc">挑战自我，速度快</span>
-                </button>
-                <button class="difficulty-btn hell" data-difficulty="hell">
-                    <span class="difficulty-icon">🔴</span>
-                    <span class="difficulty-name">地狱</span>
-                    <span class="difficulty-desc">极限挑战，有障碍</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- 皮肤选择（游戏框下方） -->
-        <div id="skinPanel" class="settings-panel">
-            <h3 class="panel-title">🎨 皮肤选择</h3>
-            <div class="skin-options" id="skinOptions">
-                <!-- 皮肤选项由 JS 动态生成 -->
-            </div>
-            <div class="skin-preview" id="skinPreview">
-                <div class="preview-label">预览</div>
-                <canvas id="previewCanvas" width="200" height="100"></canvas>
-            </div>
-        </div>
-
-        <!-- 游戏控制按钮（移动端） -->
-        <div class="mobile-controls">
-            <button class="control-btn up" data-direction="up">▲</button>
-            <div class="control-row">
-                <button class="control-btn left" data-direction="left">◀</button>
-                <button class="control-btn down" data-direction="down">▼</button>
-                <button class="control-btn right" data-direction="right">▶</button>
-            </div>
-        </div>
-
-        <!-- 游戏说明 -->
-        <div class="game-instructions">
-            <h3>游戏说明</h3>
-            <ul>
-                <li><strong>方向键 / WASD:</strong> 控制蛇的移动方向</li>
-                <li><strong>空格键:</strong> 暂停/继续游戏</li>
-                <li><strong>触摸屏幕:</strong> 滑动控制方向（移动端）</li>
-                <li><strong>目标:</strong> 吃到食物增长身体，避免撞墙或撞到自己</li>
-            </ul>
-        </div>
-
-        <!-- 页脚 -->
-        <footer class="game-footer">
-            <p>按 <kbd>空格</kbd> 暂停游戏 | 按 <kbd>开始</kbd> 重新开始</p>
-        </footer>
     </div>
 
-    <!-- 皮肤系统脚本 -->
+    <div class="page-layout">
+        <!-- ===== 左侧：排行榜 ===== -->
+        <aside class="sidebar sidebar-left" id="leaderboardPanel">
+            <div class="sidebar-header">
+                <h2>🏆 排行榜</h2>
+                <span class="sidebar-badge" id="leaderboardCount">TOP 20</span>
+            </div>
+            <div class="leaderboard-list" id="leaderboardList">
+                <div class="empty-state">暂无记录，快来挑战！</div>
+            </div>
+        </aside>
+
+        <!-- ===== 中间：游戏主区域 ===== -->
+        <main class="game-container">
+            <header class="game-header">
+                <h1>🐍 贪吃蛇</h1>
+                <p class="subtitle">Classic Snake Game</p>
+                <button id="setNicknameBtn" class="nickname-btn">🏷️ <span id="displayNickname">蛇友</span></button>
+            </header>
+
+            <div class="info-panel">
+                <div class="score-board">
+                    <span class="label">得分</span>
+                    <span id="currentScore" class="score">0</span>
+                </div>
+                <div class="score-board">
+                    <span class="label">最高分</span>
+                    <span id="highScore" class="score high-score">0</span>
+                </div>
+            </div>
+
+            <div class="canvas-wrapper">
+                <canvas id="gameCanvas" width="600" height="400"></canvas>
+                <div id="gameOverlay" class="game-overlay">
+                    <div class="overlay-content">
+                        <h2 id="overlayTitle">贪吃蛇游戏</h2>
+                        <p id="overlayMessage">使用方向键或 WASD 控制蛇的移动</p>
+                        <div id="difficultyDisplay" class="difficulty-display" style="display: none;">
+                            <span class="difficulty-label">难度：</span>
+                            <span id="currentDifficulty" class="difficulty-value">容易</span>
+                        </div>
+                    </div>
+                    <div class="overlay-buttons">
+                        <button id="startBtn" class="btn btn-primary">开始游戏</button>
+                        <button id="pauseBtn" class="btn btn-secondary" style="display: none;">暂停游戏</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 难度选择 -->
+            <div id="difficultyPanel" class="settings-panel">
+                <h3 class="panel-title">🎯 难度选择</h3>
+                <div class="difficulty-options">
+                    <button class="difficulty-btn easy selected" data-difficulty="easy">
+                        <span class="difficulty-icon">🟢</span>
+                        <span class="difficulty-name">容易</span>
+                        <span class="difficulty-desc">适合新手</span>
+                    </button>
+                    <button class="difficulty-btn hard" data-difficulty="hard">
+                        <span class="difficulty-icon">🟡</span>
+                        <span class="difficulty-name">困难</span>
+                        <span class="difficulty-desc">速度更快</span>
+                    </button>
+                    <button class="difficulty-btn hell" data-difficulty="hell">
+                        <span class="difficulty-icon">🔴</span>
+                        <span class="difficulty-name">地狱</span>
+                        <span class="difficulty-desc">有障碍物</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 皮肤选择 -->
+            <div id="skinPanel" class="settings-panel">
+                <h3 class="panel-title">🎨 皮肤选择</h3>
+                <div class="skin-options" id="skinOptions"></div>
+                <div class="skin-preview" id="skinPreview">
+                    <div class="preview-label">预览</div>
+                    <canvas id="previewCanvas" width="200" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- 移动端控制 -->
+            <div class="mobile-controls">
+                <button class="control-btn up" data-direction="up">▲</button>
+                <div class="control-row">
+                    <button class="control-btn left" data-direction="left">◀</button>
+                    <button class="control-btn down" data-direction="down">▼</button>
+                    <button class="control-btn right" data-direction="right">▶</button>
+                </div>
+            </div>
+
+            <footer class="game-footer">
+                <p>按 <kbd>空格</kbd> 暂停游戏 | 按 <kbd>开始</kbd> 重新开始</p>
+            </footer>
+        </main>
+
+        <!-- ===== 右侧：评论区 ===== -->
+        <aside class="sidebar sidebar-right" id="commentPanel">
+            <div class="sidebar-header">
+                <h2>💬 评论</h2>
+                <span class="sidebar-badge" id="commentCount">0</span>
+            </div>
+            <!-- 评论输入 -->
+            <div class="comment-input-area">
+                <input type="text" id="commentInput" maxlength="50" placeholder="说点什么...（回车发送）" />
+                <button id="commentSendBtn" class="comment-send-btn">发送</button>
+            </div>
+            <!-- 评论列表 -->
+            <div class="comment-list" id="commentList">
+                <div class="empty-state">暂无评论，快来发第一条！</div>
+            </div>
+        </aside>
+    </div>
+
+    <script src="leaderboard.js"></script>
+    <script src="comments.js"></script>
     <script src="skins.js"></script>
-    <!-- 游戏逻辑脚本 -->
     <script src="game.js"></script>
 </body>
 </html>
