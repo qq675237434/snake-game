@@ -31,59 +31,55 @@
         <div class="canvas-wrapper">
             <canvas id="gameCanvas" width="600" height="400"></canvas>
             
-            <!-- 游戏覆盖层（开始/暂停/结束/难度选择） -->
+            <!-- 游戏覆盖层（仅显示状态信息和开始按钮） -->
             <div id="gameOverlay" class="game-overlay">
                 <div class="overlay-content">
                     <h2 id="overlayTitle">贪吃蛇游戏</h2>
                     <p id="overlayMessage">使用方向键或 WASD 控制蛇的移动</p>
-                    
-                    <!-- 难度选择容器 -->
-                    <div id="difficultySelector" class="difficulty-selector">
-                        <h3 class="difficulty-title">选择难度</h3>
-                        <div class="difficulty-options">
-                            <button class="difficulty-btn easy" data-difficulty="easy">
-                                <span class="difficulty-icon">🟢</span>
-                                <span class="difficulty-name">容易</span>
-                                <span class="difficulty-desc">适合新手，速度慢</span>
-                            </button>
-                            <button class="difficulty-btn hard" data-difficulty="hard">
-                                <span class="difficulty-icon">🟡</span>
-                                <span class="difficulty-name">困难</span>
-                                <span class="difficulty-desc">挑战自我，速度快</span>
-                            </button>
-                            <button class="difficulty-btn hell" data-difficulty="hell">
-                                <span class="difficulty-icon">🔴</span>
-                                <span class="difficulty-name">地狱</span>
-                                <span class="difficulty-desc">极限挑战，有障碍</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- 皮肤选择容器 -->
-                    <div id="skinSelector" class="skin-selector" style="display: none;">
-                        <h3 class="skin-title">选择皮肤</h3>
-                        <div class="skin-options" id="skinOptions">
-                            <!-- 皮肤选项由 JS 动态生成 -->
-                        </div>
-                        <div class="skin-preview" id="skinPreview">
-                            <div class="preview-label">预览</div>
-                            <canvas id="previewCanvas" width="200" height="100"></canvas>
-                        </div>
-                        <button id="backToDifficultyBtn" class="btn btn-secondary">返回难度选择</button>
-                    </div>
-                    
                     <!-- 游戏进行中难度显示 -->
                     <div id="difficultyDisplay" class="difficulty-display" style="display: none;">
                         <span class="difficulty-label">难度：</span>
                         <span id="currentDifficulty" class="difficulty-value">容易</span>
                     </div>
                 </div>
-                
-                <!-- 固定底部按钮栏 -->
                 <div class="overlay-buttons">
                     <button id="startBtn" class="btn btn-primary">开始游戏</button>
                     <button id="pauseBtn" class="btn btn-secondary" style="display: none;">暂停游戏</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- 难度选择（游戏框下方） -->
+        <div id="difficultyPanel" class="settings-panel">
+            <h3 class="panel-title">🎯 难度选择</h3>
+            <div class="difficulty-options">
+                <button class="difficulty-btn easy selected" data-difficulty="easy">
+                    <span class="difficulty-icon">🟢</span>
+                    <span class="difficulty-name">容易</span>
+                    <span class="difficulty-desc">适合新手，速度慢</span>
+                </button>
+                <button class="difficulty-btn hard" data-difficulty="hard">
+                    <span class="difficulty-icon">🟡</span>
+                    <span class="difficulty-name">困难</span>
+                    <span class="difficulty-desc">挑战自我，速度快</span>
+                </button>
+                <button class="difficulty-btn hell" data-difficulty="hell">
+                    <span class="difficulty-icon">🔴</span>
+                    <span class="difficulty-name">地狱</span>
+                    <span class="difficulty-desc">极限挑战，有障碍</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 皮肤选择（游戏框下方） -->
+        <div id="skinPanel" class="settings-panel">
+            <h3 class="panel-title">🎨 皮肤选择</h3>
+            <div class="skin-options" id="skinOptions">
+                <!-- 皮肤选项由 JS 动态生成 -->
+            </div>
+            <div class="skin-preview" id="skinPreview">
+                <div class="preview-label">预览</div>
+                <canvas id="previewCanvas" width="200" height="100"></canvas>
             </div>
         </div>
 
@@ -104,7 +100,7 @@
                 <li><strong>方向键 / WASD:</strong> 控制蛇的移动方向</li>
                 <li><strong>空格键:</strong> 暂停/继续游戏</li>
                 <li><strong>触摸屏幕:</strong> 滑动控制方向（移动端）</li>
-                <li><strong>目标:</strong> 吃到食物增长身体，避免撞墙或撞到自已</li>
+                <li><strong>目标:</strong> 吃到食物增长身体，避免撞墙或撞到自己</li>
             </ul>
         </div>
 
